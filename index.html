@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FashionHub - Women's Fashion Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        .carousel-container {
+            overflow: hidden;
+        }
+        
+        .carousel-track {
+            display: flex;
+            transition: transform 0.3s ease;
+        }
+        
+        .carousel-item {
+            min-width: 250px;
+            margin-right: 1rem;
+        }
+        
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        
+        .hero-slider {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .admin-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+        
+        .admin-content {
+            background: white;
+            margin: 2% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between py-4">
+                <div class="flex items-center space-x-8">
+                    <h1 class="text-2xl font-bold text-pink-600 cursor-pointer" onclick="logoClick()" id="logo">FashionHub</h1>
+                    <nav class="hidden md:flex space-x-6">
+                        <a href="#" onclick="showPage('home')" class="text-gray-700 hover:text-pink-600">Home</a>
+                        <div class="dropdown relative">
+                            <button class="text-gray-700 hover:text-pink-600 flex items-center">
+                                Shop <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                            </button>
+                            <div class="dropdown-menu absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 hidden">
+                                <a href="#" onclick="showCategory('clothes')" class="block px-4 py-2 text-gray-700 hover:bg-pink-50">Clothes</a>
+                                <a href="#" onclick="showCategory('shoes')" class="block px-4 py-2 text-gray-700 hover:bg-pink-50">Shoes</a>
+                                <a href="#" onclick="showCategory('glasses')" class="block px-4 py-2 text-gray-700 hover:bg-pink-50">Glasses</a>
+                                <a href="#" onclick="showCategory('jewelry')" class="block px-4 py-2 text-gray-700 hover:bg-pink-50">Jewelry</a>
+                                <a href="#" onclick="showCategory('bags')" class="block px-4 py-2 text-gray-700 hover:bg-pink-50">Bags</a>
+                                <a href="#" onclick="showCategory('watches')" class="block px-4 py-2 text-gray-700 hover:bg-pink-50">Wrist Watches</a>
+                            </div>
+                        </div>
+                        <a href="#" onclick="showPage('about')" class="text-gray-700 hover:text-pink-600">About</a>
+                        <a href="#" onclick="showPage('contact')" class="text-gray-700 hover:text-pink-600">Contact</a>
+                        <button id="adminBtn" onclick="showAdminPanel()" class="text-gray-700 hover:text-pink-600 hidden">Admin</button>
+                    </nav>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="Search products..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                        <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+                        </svg>
+                    </div>
+                    <button onclick="showCart()" class="relative p-2 text-gray-700 hover:text-pink-600">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                        </svg>
+                        <span id="cartCount" class="absolute -top-2 -right-2 bg-pink-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="mainContent">
+        <!-- Home Page -->
+        <div id="homePage" class="page">
+            <!-- Hero Section -->
+            <section class="hero-slider bg-gradient-to-r from-pink-100 to-purple-100 py-16">
+                <div class="container mx-auto px-4">
+                    <div class="slide active text-center">
+                        <h2 class="text-4xl md:text-6xl font-bold text-gray-800 mb-4">Trending Fashion</h2>
+                        <p class="text-xl text-gray-600 mb-8">Discover the latest in women's fashion</p>
+                        <button onclick="showCategory('clothes')" class="bg-pink-600 text-white px-8 py-3 rounded-lg hover:bg-pink-700 transition">Shop Now</button>
+                    </div>
+                    <div class="slide text-center">
+                        <h2 class="text-4xl md:text-6xl font-bold text-gray-800 mb-4">Elegant Accessories</h2>
+                        <p class="text-xl text-gray-600 mb-8">Complete your look with our stunning accessories</p>
+                        <button onclick="showCategory('jewelry')" class="bg-pink-600 text-white px-8 py-3 rounded-lg hover:bg-pink-700 transition">Explore</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Featured Categories -->
+            <section class="py-16">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">Shop by Category</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                        <div onclick="showCategory('clothes')" class="category-card bg-white rounded-lg shadow-md p-6 text-center cursor-pointer hover:shadow-lg transition">
+                            <div class="text-4xl mb-4">👗</div>
+                            <h3 class="font-semibold">Clothes</h3>
+                        </div>
+                        <div onclick="showCategory('shoes')" class="category-card bg-white rounded-lg shadow-md p-6 text-center cursor-pointer hover:shadow-lg transition">
+                            <div class="text-4xl mb-4">👠</div>
+                            <h3 class="font-semibold">Shoes</h3>
+                        </div>
+                        <div onclick="showCategory('glasses')" class="category-card bg-white rounded-lg shadow-md p-6 text-center cursor-pointer hover:shadow-lg transition">
+                            <div class="text-4xl mb-4">🕶️</div>
+                            <h3 class="font-semibold">Glasses</h3>
+                        </div>
+                        <div onclick="showCategory('jewelry')" class="category-card bg-white rounded-lg shadow-md p-6 text-center cursor-pointer hover:shadow-lg transition">
+                            <div class="text-4xl mb-4">💎</div>
+                            <h3 class="font-semibold">Jewelry</h3>
+                        </div>
+                        <div onclick="showCategory('bags')" class="category-card bg-white rounded-lg shadow-md p-6 text-center cursor-pointer hover:shadow-lg transition">
+                            <div class="text-4xl mb-4">👜</div>
+                            <h3 class="font-semibold">Bags</h3>
+                        </div>
+                        <div onclick="showCategory('watches')" class="category-card bg-white rounded-lg shadow-md p-6 text-center cursor-pointer hover:shadow-lg transition">
+                            <div class="text-4xl mb-4">⌚</div>
+                            <h3 class="font-semibold">Watches</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trending Products -->
+            <section class="py-16 bg-white">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">Trending Products</h2>
+                    <div id="trendingProducts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Products will be loaded here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Category Page -->
+        <div id="categoryPage" class="page hidden">
+            <div class="container mx-auto px-4 py-8">
+                <h2 id="categoryTitle" class="text-3xl font-bold mb-8"></h2>
+                <div id="categoryProducts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Category products will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Detail Page -->
+        <div id="productDetailPage" class="page hidden">
+            <div class="container mx-auto px-4 py-8">
+                <div id="productDetail">
+                    <!-- Product details will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Page -->
+        <div id="cartPage" class="page hidden">
+            <div class="container mx-auto px-4 py-8">
+                <h2 class="text-3xl font-bold mb-8">Shopping Cart</h2>
+                <div id="cartItems">
+                    <!-- Cart items will be loaded here -->
+                </div>
+                <div id="cartTotal" class="mt-8 text-right">
+                    <div class="text-2xl font-bold">Total: ₦<span id="totalAmount">0</span></div>
+                    <button onclick="showCheckout()" class="mt-4 bg-pink-600 text-white px-8 py-3 rounded-lg hover:bg-pink-700 transition">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Page -->
+        <div id="checkoutPage" class="page hidden">
+            <div class="container mx-auto px-4 py-8">
+                <h2 class="text-3xl font-bold mb-8">Checkout</h2>
+                <form id="checkoutForm" onsubmit="placeOrder(event)">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4">Customer Details</h3>
+                            <div class="space-y-4">
+                                <input type="text" name="fullName" placeholder="Full Name" required class="w-full p-3 border rounded-lg">
+                                <input type="email" name="email" placeholder="Email" required class="w-full p-3 border rounded-lg">
+                                <input type="tel" name="phone" placeholder="Phone Number" required class="w-full p-3 border rounded-lg">
+                                <textarea name="address" placeholder="Delivery Address" required class="w-full p-3 border rounded-lg h-24"></textarea>
+                            </div>
+                            
+                            <h3 class="text-xl font-semibold mb-4 mt-8">Payment Method</h3>
+                            <div class="space-y-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="paymentMethod" value="bank" class="mr-2" onchange="togglePaymentDetails()">
+                                    Bank Transfer
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="paymentMethod" value="delivery" class="mr-2" onchange="togglePaymentDetails()">
+                                    Pay on Delivery
+                                </label>
+                            </div>
+                            
+                            <div id="bankDetails" class="mt-4 p-4 bg-gray-100 rounded-lg hidden">
+                                <h4 class="font-semibold mb-2">Bank Transfer Details</h4>
+                                <p><strong>Bank:</strong> First Bank Nigeria</p>
+                                <p><strong>Account Name:</strong> FashionHub Store</p>
+                                <p><strong>Account Number:</strong> 1234567890</p>
+                                <p><strong>Reference:</strong> <span id="orderRef"></span></p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4">Order Summary</h3>
+                            <div id="checkoutSummary" class="bg-gray-50 p-4 rounded-lg">
+                                <!-- Order summary will be loaded here -->
+                            </div>
+                            <button type="submit" class="w-full mt-6 bg-pink-600 text-white py-3 rounded-lg hover:bg-pink-700 transition">Place Order</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- About Page -->
+        <div id="aboutPage" class="page hidden">
+            <div class="container mx-auto px-4 py-8">
+                <h2 class="text-3xl font-bold mb-8">About FashionHub</h2>
+                <div class="prose max-w-none">
+                    <p class="text-lg mb-6">Welcome to FashionHub, your premier destination for women's fashion in Nigeria. We are dedicated to bringing you the latest trends and timeless classics in women's clothing, shoes, accessories, and more.</p>
+                    <p class="text-lg mb-6">Founded with a passion for fashion and a commitment to quality, FashionHub curates collections that celebrate the modern Nigerian woman. From elegant dresses to statement jewelry, we offer pieces that help you express your unique style.</p>
+                    <h3 class="text-2xl font-semibold mb-4">Our Mission</h3>
+                    <p class="text-lg mb-6">To empower women through fashion by providing high-quality, affordable, and stylish clothing and accessories that make every woman feel confident and beautiful.</p>
+                    <h3 class="text-2xl font-semibold mb-4">Why Choose FashionHub?</h3>
+                    <ul class="list-disc pl-6 text-lg space-y-2">
+                        <li>Carefully curated collections</li>
+                        <li>Affordable prices</li>
+                        <li>Fast and reliable delivery</li>
+                        <li>Excellent customer service</li>
+                        <li>Easy returns and exchanges</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Page -->
+        <div id="contactPage" class="page hidden">
+            <div class="container mx-auto px-4 py-8">
+                <h2 class="text-3xl font-bold mb-8">Contact Us</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Get in Touch</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-3 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                                </svg>
+                                <span>info@fashionhub.ng</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-3 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                                </svg>
+                                <span>+234 801 234 5678</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-3 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"/>
+                                </svg>
+                                <span>123 Fashion Street, Lagos, Nigeria</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <h4 class="font-semibold mb-4">Business Hours</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Monday - Friday:</span>
+                                    <span>9:00 AM - 6:00 PM</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Saturday:</span>
+                                    <span>10:00 AM - 4:00 PM</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Sunday:</span>
+                                    <span>Closed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Send us a Message</h3>
+                        <form onsubmit="sendMessage(event)" class="space-y-4">
+                            <input type="text" name="name" placeholder="Your Name" required class="w-full p-3 border rounded-lg">
+                            <input type="email" name="email" placeholder="Your Email" required class="w-full p-3 border rounded-lg">
+                            <input type="text" name="subject" placeholder="Subject" required class="w-full p-3 border rounded-lg">
+                            <textarea name="message" placeholder="Your Message" required class="w-full p-3 border rounded-lg h-32"></textarea>
+                            <button type="submit" class="w-full bg-pink-600 text-white py-3 rounded-lg hover:bg-pink-700 transition">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">FashionHub</h3>
+                    <p class="text-gray-300">Your premier destination for women's fashion in Nigeria.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" onclick="showPage('about')" class="text-gray-300 hover:text-white">About Us</a></li>
+                        <li><a href="#" onclick="showPage('contact')" class="text-gray-300 hover:text-white">Contact</a></li>
+                        <li><a href="#" onclick="showPage('shipping')" class="text-gray-300 hover:text-white">Shipping Info</a></li>
+                        <li><a href="#" onclick="showPage('returns')" class="text-gray-300 hover:text-white">Returns</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Policies</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" onclick="showPage('privacy')" class="text-gray-300 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" onclick="showPage('terms')" class="text-gray-300 hover:text-white">Terms of Service</a></li>
+                        <li><a href="#" onclick="showPage('faq')" class="text-gray-300 hover:text-white">FAQ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Follow Us</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" onclick="openSocial('facebook')" class="text-gray-300 hover:text-white">Facebook</a>
+                        <a href="#" onclick="openSocial('instagram')" class="text-gray-300 hover:text-white">Instagram</a>
+                        <a href="#" onclick="openSocial('twitter')" class="text-gray-300 hover:text-white">Twitter</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p>&copy; 2024 FashionHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel">
+        <div class="admin-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Admin Panel</h2>
+                <button onclick="closeAdminPanel()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-4" id="formTitle">Add New Product</h3>
+                <form id="addProductForm" onsubmit="saveProduct(event)" class="space-y-4">
+                    <input type="hidden" name="editId" id="editId">
+                    <input type="text" name="name" id="productName" placeholder="Product Name" required class="w-full p-3 border rounded-lg">
+                    <input type="number" name="price" id="productPrice" placeholder="Price (₦)" required class="w-full p-3 border rounded-lg">
+                    <select name="category" id="productCategory" required class="w-full p-3 border rounded-lg">
+                        <option value="">Select Category</option>
+                        <option value="clothes">Clothes</option>
+                        <option value="shoes">Shoes</option>
+                        <option value="glasses">Glasses</option>
+                        <option value="jewelry">Jewelry</option>
+                        <option value="bags">Bags</option>
+                        <option value="watches">Watches</option>
+                    </select>
+                    <input type="file" name="image" id="productImage" accept="image/*" class="w-full p-3 border rounded-lg">
+                    <div id="currentImagePreview" class="hidden">
+                        <p class="text-sm text-gray-600 mb-2">Current Image:</p>
+                        <img id="currentImage" src="" alt="Current product image" class="w-20 h-20 object-cover rounded">
+                        <p class="text-xs text-gray-500 mt-1">Upload a new image to replace current one</p>
+                    </div>
+                    <textarea name="description" id="productDescription" placeholder="Product Description" required class="w-full p-3 border rounded-lg h-24"></textarea>
+                    <input type="text" name="sizes" id="productSizes" placeholder="Available Sizes (comma separated, e.g., S,M,L,XL)" class="w-full p-3 border rounded-lg">
+                    <div class="flex space-x-4">
+                        <button type="submit" id="saveBtn" class="flex-1 bg-pink-600 text-white py-3 rounded-lg hover:bg-pink-700 transition">Add Product</button>
+                        <button type="button" id="cancelBtn" onclick="cancelEdit()" class="flex-1 bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition hidden">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Manage Products</h3>
+                <div id="adminProductList" class="space-y-4 max-h-96 overflow-y-auto">
+                    <!-- Admin product list will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let products = [];
+        let cart = [];
+        let currentPage = 'home';
+        let logoClickCount = 0;
+        let isAdmin = false;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSampleProducts();
+            updateCartCount();
+            startHeroSlider();
+            loadTrendingProducts();
+            
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                if (e.target.value.length > 2) {
+                    searchProducts(e.target.value);
+                }
+            });
+        });
+
+        // Logo click handler for admin access
+        function logoClick() {
+            logoClickCount++;
+            if (logoClickCount === 4) {
+                isAdmin = true;
+                document.getElementById('adminBtn').classList.remove('hidden');
+                alert('Admin access granted!');
+                logoClickCount = 0;
+            }
+            setTimeout(() => {
+                logoClickCount = 0;
+            }, 2000);
+        }
+
+        // Load sample products
+        function loadSampleProducts() {
+            const sampleProducts = [
+                {
+                    id: 1,
+                    name: "Elegant Summer Dress",
+                    price: 15000,
+                    category: "clothes",
+                    image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400",
+                    description: "Beautiful summer dress perfect for any occasion",
+                    sizes: ["S", "M", "L", "XL"]
+                },
+                {
+                    id: 2,
+                    name: "Designer Heels",
+                    price: 25000,
+                    category: "shoes",
+                    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400",
+                    description: "Stylish designer heels for the modern woman",
+                    sizes: ["36", "37", "38", "39", "40"]
+                },
+                {
+                    id: 3,
+                    name: "Fashion Sunglasses",
+                    price: 8000,
+                    category: "glasses",
+                    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400",
+                    description: "Trendy sunglasses with UV protection"
+                },
+                {
+                    id: 4,
+                    name: "Gold Necklace",
+                    price: 35000,
+                    category: "jewelry",
+                    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400",
+                    description: "Elegant gold necklace with pendant"
+                },
+                {
+                    id: 5,
+                    name: "Leather Handbag",
+                    price: 20000,
+                    category: "bags",
+                    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400",
+                    description: "Premium leather handbag with multiple compartments"
+                },
+                {
+                    id: 6,
+                    name: "Rose Gold Watch",
+                    price: 45000,
+                    category: "watches",
+                    image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400",
+                    description: "Elegant rose gold watch with leather strap"
+                }
+            ];
+            
+            products = [...sampleProducts];
+        }
+
+        // Page navigation
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(page + 'Page').classList.remove('hidden');
+            currentPage = page;
+            
+            if (page === 'home') {
+                loadTrendingProducts();
+            }
+        }
+
+        // Category navigation
+        function showCategory(category) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById('categoryPage').classList.remove('hidden');
+            
+            const categoryTitles = {
+                clothes: 'Clothes',
+                shoes: 'Shoes',
+                glasses: 'Glasses',
+                jewelry: 'Jewelry',
+                bags: 'Bags',
+                watches: 'Wrist Watches'
+            };
+            
+            document.getElementById('categoryTitle').textContent = categoryTitles[category];
+            loadCategoryProducts(category);
+        }
+
+        // Load category products
+        function loadCategoryProducts(category) {
+            const categoryProducts = products.filter(p => p.category === category);
+            const container = document.getElementById('categoryProducts');
+            
+            container.innerHTML = categoryProducts.map(product => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-64 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg mb-2">${product.name}</h3>
+                        <p class="text-pink-600 font-bold text-xl mb-4">₦${product.price.toLocaleString()}</p>
+                        <button onclick="addToCart(${product.id})" class="w-full bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 transition">Add to Cart</button>
+                        <button onclick="showProductDetail(${product.id})" class="w-full mt-2 border border-pink-600 text-pink-600 py-2 rounded-lg hover:bg-pink-50 transition">View Details</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load trending products
+        function loadTrendingProducts() {
+            const trendingProducts = products.slice(0, 4);
+            const container = document.getElementById('trendingProducts');
+            
+            container.innerHTML = trendingProducts.map(product => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-64 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg mb-2">${product.name}</h3>
+                        <p class="text-pink-600 font-bold text-xl mb-4">₦${product.price.toLocaleString()}</p>
+                        <button onclick="addToCart(${product.id})" class="w-full bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 transition">Add to Cart</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show product detail
+        function showProductDetail(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById('productDetailPage').classList.remove('hidden');
+            
+            const relatedProducts = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+            
+            document.getElementById('productDetail').innerHTML = `
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <img src="${product.image}" alt="${product.name}" class="w-full rounded-lg">
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold mb-4">${product.name}</h1>
+                        <p class="text-3xl text-pink-600 font-bold mb-6">₦${product.price.toLocaleString()}</p>
+                        <p class="text-gray-600 mb-6">${product.description}</p>
+                        
+                        ${product.sizes ? `
+                            <div class="mb-6">
+                                <h3 class="font-semibold mb-2">Available Sizes:</h3>
+                                <div class="flex space-x-2">
+                                    ${product.sizes.map(size => `
+                                        <button class="border border-gray-300 px-3 py-1 rounded hover:border-pink-600">${size}</button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <button onclick="addToCart(${product.id})" class="w-full bg-pink-600 text-white py-3 rounded-lg hover:bg-pink-700 transition mb-4">Add to Cart</button>
+                    </div>
+                </div>
+                
+                <div class="mt-16">
+                    <h2 class="text-2xl font-bold mb-8">You May Also Like</h2>
+                    <div class="carousel-container">
+                        <div class="carousel-track" id="relatedCarousel">
+                            ${relatedProducts.map(relatedProduct => `
+                                <div class="carousel-item bg-white rounded-lg shadow-md overflow-hidden">
+                                    <img src="${relatedProduct.image}" alt="${relatedProduct.name}" class="w-full h-48 object-cover">
+                                    <div class="p-4">
+                                        <h3 class="font-semibold mb-2">${relatedProduct.name}</h3>
+                                        <p class="text-pink-600 font-bold mb-2">₦${relatedProduct.price.toLocaleString()}</p>
+                                        <button onclick="addToCart(${relatedProduct.id})" class="w-full bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 transition text-sm">Add to Cart</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Cart functionality
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            
+            updateCartCount();
+            alert('Product added to cart!');
+        }
+
+        function updateCartCount() {
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            document.getElementById('cartCount').textContent = count;
+        }
+
+        function showCart() {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById('cartPage').classList.remove('hidden');
+            loadCartItems();
+        }
+
+        function loadCartItems() {
+            const container = document.getElementById('cartItems');
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 py-8">Your cart is empty</p>';
+                document.getElementById('totalAmount').textContent = '0';
+                return;
+            }
+            
+            container.innerHTML = cart.map(item => `
+                <div class="flex items-center justify-between border-b py-4">
+                    <div class="flex items-center space-x-4">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded">
+                        <div>
+                            <h3 class="font-semibold">${item.name}</h3>
+                            <p class="text-pink-600">₦${item.price.toLocaleString()}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="updateQuantity(${item.id}, -1)" class="bg-gray-200 px-2 py-1 rounded">-</button>
+                            <span class="px-3">${item.quantity}</span>
+                            <button onclick="updateQuantity(${item.id}, 1)" class="bg-gray-200 px-2 py-1 rounded">+</button>
+                        </div>
+                        <button onclick="removeFromCart(${item.id})" class="text-red-600 hover:text-red-800">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('totalAmount').textContent = total.toLocaleString();
+        }
+
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    loadCartItems();
+                    updateCartCount();
+                }
+            }
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            loadCartItems();
+            updateCartCount();
+        }
+
+        // Checkout functionality
+        function showCheckout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById('checkoutPage').classList.remove('hidden');
+            loadCheckoutSummary();
+            generateOrderReference();
+        }
+
+        function loadCheckoutSummary() {
+            const container = document.getElementById('checkoutSummary');
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            container.innerHTML = `
+                <div class="space-y-2">
+                    ${cart.map(item => `
+                        <div class="flex justify-between">
+                            <span>${item.name} x ${item.quantity}</span>
+                            <span>₦${(item.price * item.quantity).toLocaleString()}</span>
+                        </div>
+                    `).join('')}
+                    <div class="border-t pt-2 font-bold">
+                        <div class="flex justify-between">
+                            <span>Total:</span>
+                            <span>₦${total.toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateOrderReference() {
+            const ref = 'FH' + Date.now().toString().slice(-8);
+            document.getElementById('orderRef').textContent = ref;
+        }
+
+        function togglePaymentDetails() {
+            const bankDetails = document.getElementById('bankDetails');
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            
+            if (paymentMethod === 'bank') {
+                bankDetails.classList.remove('hidden');
+            } else {
+                bankDetails.classList.add('hidden');
+            }
+        }
+
+        function placeOrder(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const orderData = {
+                customer: {
+                    fullName: formData.get('fullName'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    address: formData.get('address')
+                },
+                paymentMethod: formData.get('paymentMethod'),
+                items: cart,
+                total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                orderRef: document.getElementById('orderRef').textContent,
+                date: new Date().toISOString()
+            };
+            
+            // In a real application, this would be sent to a server
+            console.log('Order placed:', orderData);
+            
+            alert('Order placed successfully! You will receive a confirmation email shortly.');
+            cart = [];
+            updateCartCount();
+            showPage('home');
+        }
+
+        // Search functionality
+        function searchProducts(query) {
+            const results = products.filter(product => 
+                product.name.toLowerCase().includes(query.toLowerCase()) ||
+                product.category.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            // Show search results (simplified implementation)
+            if (results.length > 0) {
+                showCategory(results[0].category);
+            }
+        }
+
+        // Hero slider
+        function startHeroSlider() {
+            const slides = document.querySelectorAll('.slide');
+            let currentSlide = 0;
+            
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 5000);
+        }
+
+        // Admin panel functionality
+        function showAdminPanel() {
+            if (!isAdmin) {
+                alert('Access denied!');
+                return;
+            }
+            document.getElementById('adminPanel').style.display = 'block';
+            loadAdminProducts();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        function saveProduct(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const imageFile = formData.get('image');
+            const editId = formData.get('editId');
+            
+            const productData = {
+                name: formData.get('name'),
+                price: parseInt(formData.get('price')),
+                category: formData.get('category'),
+                description: formData.get('description'),
+                sizes: formData.get('sizes') ? formData.get('sizes').split(',').map(s => s.trim()) : null
+            };
+            
+            if (editId) {
+                // Editing existing product
+                const productIndex = products.findIndex(p => p.id === parseInt(editId));
+                if (productIndex !== -1) {
+                    // Keep existing image if no new image uploaded
+                    productData.image = products[productIndex].image;
+                    productData.id = parseInt(editId);
+                    
+                    if (imageFile && imageFile.size > 0) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            productData.image = e.target.result;
+                            products[productIndex] = productData;
+                            finishSave('Product updated successfully!');
+                        };
+                        reader.readAsDataURL(imageFile);
+                    } else {
+                        products[productIndex] = productData;
+                        finishSave('Product updated successfully!');
+                    }
+                }
+            } else {
+                // Adding new product
+                if (imageFile && imageFile.size > 0) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        productData.id = Date.now();
+                        productData.image = e.target.result;
+                        products.push(productData);
+                        finishSave('Product added successfully!');
+                    };
+                    reader.readAsDataURL(imageFile);
+                } else {
+                    alert('Please select an image for the new product.');
+                    return;
+                }
+            }
+            
+            function finishSave(message) {
+                loadAdminProducts();
+                loadTrendingProducts();
+                resetForm();
+                alert(message);
+            }
+        }
+        
+        function editProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            // Fill form with product data
+            document.getElementById('editId').value = product.id;
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('productCategory').value = product.category;
+            document.getElementById('productDescription').value = product.description;
+            document.getElementById('productSizes').value = product.sizes ? product.sizes.join(', ') : '';
+            
+            // Show current image
+            document.getElementById('currentImage').src = product.image;
+            document.getElementById('currentImagePreview').classList.remove('hidden');
+            
+            // Update form appearance
+            document.getElementById('formTitle').textContent = 'Edit Product';
+            document.getElementById('saveBtn').textContent = 'Update Product';
+            document.getElementById('cancelBtn').classList.remove('hidden');
+            document.getElementById('productImage').removeAttribute('required');
+            
+            // Scroll to form
+            document.getElementById('addProductForm').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function cancelEdit() {
+            resetForm();
+        }
+        
+        function resetForm() {
+            document.getElementById('addProductForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('currentImagePreview').classList.add('hidden');
+            document.getElementById('formTitle').textContent = 'Add New Product';
+            document.getElementById('saveBtn').textContent = 'Add Product';
+            document.getElementById('cancelBtn').classList.add('hidden');
+            document.getElementById('productImage').setAttribute('required', '');
+        }
+
+        function loadAdminProducts() {
+            const container = document.getElementById('adminProductList');
+            
+            container.innerHTML = products.map(product => `
+                <div class="flex items-center justify-between border p-4 rounded-lg">
+                    <div class="flex items-center space-x-4">
+                        <img src="${product.image}" alt="${product.name}" class="w-16 h-16 object-cover rounded">
+                        <div>
+                            <h4 class="font-semibold">${product.name}</h4>
+                            <p class="text-gray-600">₦${product.price.toLocaleString()}</p>
+                            <p class="text-sm text-gray-500">${product.category}</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="editProduct(${product.id})" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">Edit</button>
+                        <button onclick="deleteProduct(${product.id})" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) {
+                alert('Product not found!');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete "${product.name}"? This action cannot be undone.`)) {
+                // Remove from products array
+                products = products.filter(p => p.id !== productId);
+                
+                // Remove from cart if it exists there
+                cart = cart.filter(item => item.id !== productId);
+                
+                // Update displays
+                loadAdminProducts();
+                loadTrendingProducts();
+                updateCartCount();
+                
+                // Reset form if this product was being edited
+                const editId = document.getElementById('editId').value;
+                if (editId && parseInt(editId) === productId) {
+                    resetForm();
+                }
+                
+                alert('Product deleted successfully!');
+            }
+        }
+
+        // Footer link handlers
+        function sendMessage(event) {
+            event.preventDefault();
+            alert('Message sent successfully! We will get back to you soon.');
+            event.target.reset();
+        }
+
+        function openSocial(platform) {
+            const urls = {
+                facebook: 'https://facebook.com/fashionhub',
+                instagram: 'https://instagram.com/fashionhub',
+                twitter: 'https://twitter.com/fashionhub'
+            };
+            window.open(urls[platform], '_blank', 'noopener,noreferrer');
+        }
+
+        // Additional footer pages (simplified)
+        window.addEventListener('click', function(e) {
+            if (e.target.onclick && e.target.onclick.toString().includes('showPage')) {
+                const page = e.target.onclick.toString().match(/showPage\('(\w+)'\)/);
+                if (page && ['shipping', 'returns', 'privacy', 'terms', 'faq'].includes(page[1])) {
+                    alert(`${page[1].charAt(0).toUpperCase() + page[1].slice(1)} page would be displayed here in a full implementation.`);
+                }
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987e62eda6476343',t:'MTc1OTM0NzE1MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
