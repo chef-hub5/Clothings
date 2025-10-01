@@ -500,6 +500,7 @@
         let currentPage = 'home';
         let logoClickCount = 0;
         let isAdmin = false;
+        let currentProductDetailId = null;
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
@@ -602,6 +603,11 @@
             document.getElementById(page + 'Page').classList.remove('hidden');
             currentPage = page;
             
+            // Clear product detail tracking when navigating away
+            if (page !== 'productDetail') {
+                currentProductDetailId = null;
+            }
+            
             if (page === 'home') {
                 loadTrendingProducts();
             }
@@ -611,6 +617,9 @@
         function showCategory(category) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             document.getElementById('categoryPage').classList.remove('hidden');
+            
+            // Clear product detail tracking when navigating to category
+            currentProductDetailId = null;
             
             const categoryTitles = {
                 clothes: 'Clothes',
@@ -665,6 +674,7 @@
             const product = products.find(p => p.id === productId);
             if (!product) return;
             
+            currentProductDetailId = productId;
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             document.getElementById('productDetailPage').classList.remove('hidden');
             
@@ -967,6 +977,35 @@
             function finishSave(message) {
                 loadAdminProducts();
                 loadTrendingProducts();
+                
+                // Update current page if showing products
+                if (currentPage === 'home') {
+                    loadTrendingProducts();
+                } else if (document.getElementById('categoryPage').classList.contains('page') && !document.getElementById('categoryPage').classList.contains('hidden')) {
+                    // Reload current category
+                    const categoryTitle = document.getElementById('categoryTitle').textContent.toLowerCase();
+                    const categoryMap = {
+                        'clothes': 'clothes',
+                        'shoes': 'shoes', 
+                        'glasses': 'glasses',
+                        'jewelry': 'jewelry',
+                        'bags': 'bags',
+                        'wrist watches': 'watches'
+                    };
+                    if (categoryMap[categoryTitle]) {
+                        loadCategoryProducts(categoryMap[categoryTitle]);
+                    }
+                } else if (document.getElementById('productDetailPage').classList.contains('page') && !document.getElementById('productDetailPage').classList.contains('hidden')) {
+                    // If viewing product detail, check if it's the updated product
+                    const currentProductId = getCurrentProductDetailId();
+                    if (currentProductId && (currentProductId === parseInt(editId) || products.find(p => p.id === currentProductId))) {
+                        showProductDetail(currentProductId);
+                    }
+                }
+                
+                // Update cart items if any were modified
+                updateCartWithChangedProducts();
+                
                 resetForm();
                 alert(message);
             }
@@ -1052,6 +1091,34 @@
                 loadTrendingProducts();
                 updateCartCount();
                 
+                // Update current page if showing products
+                if (currentPage === 'home') {
+                    loadTrendingProducts();
+                } else if (document.getElementById('categoryPage').classList.contains('page') && !document.getElementById('categoryPage').classList.contains('hidden')) {
+                    // Reload current category
+                    const categoryTitle = document.getElementById('categoryTitle').textContent.toLowerCase();
+                    const categoryMap = {
+                        'clothes': 'clothes',
+                        'shoes': 'shoes', 
+                        'glasses': 'glasses',
+                        'jewelry': 'jewelry',
+                        'bags': 'bags',
+                        'wrist watches': 'watches'
+                    };
+                    if (categoryMap[categoryTitle]) {
+                        loadCategoryProducts(categoryMap[categoryTitle]);
+                    }
+                } else if (currentProductDetailId === productId) {
+                    // If viewing the deleted product, go back to home
+                    showPage('home');
+                    currentProductDetailId = null;
+                }
+                
+                // Update cart display if currently viewing cart
+                if (!document.getElementById('cartPage').classList.contains('hidden')) {
+                    loadCartItems();
+                }
+                
                 // Reset form if this product was being edited
                 const editId = document.getElementById('editId').value;
                 if (editId && parseInt(editId) === productId) {
@@ -1060,6 +1127,34 @@
                 
                 alert('Product deleted successfully!');
             }
+        }
+
+        // Helper function to get current product detail ID
+        function getCurrentProductDetailId() {
+            return currentProductDetailId;
+        }
+
+        // Helper function to update cart with changed products
+        function updateCartWithChangedProducts() {
+            // Update cart items with latest product information
+            cart = cart.map(cartItem => {
+                const updatedProduct = products.find(p => p.id === cartItem.id);
+                if (updatedProduct) {
+                    return {
+                        ...updatedProduct,
+                        quantity: cartItem.quantity
+                    };
+                }
+                return cartItem;
+            }).filter(cartItem => products.find(p => p.id === cartItem.id)); // Remove deleted products
+            
+            // Update cart display if currently viewing cart
+            if (!document.getElementById('cartPage').classList.contains('hidden')) {
+                loadCartItems();
+            }
+            
+            // Update cart count
+            updateCartCount();
         }
 
         // Footer link handlers
@@ -1136,5 +1231,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987e6ce9c4b79490',t:'MTc1OTM0NzU2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987e7710b2c7fc3b',t:'MTc1OTM0Nzk3NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
