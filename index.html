@@ -75,9 +75,11 @@
     <header class="bg-white shadow-md sticky top-0 z-50">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between py-4">
-                <div class="flex items-center space-x-8">
+                <div class="flex items-center space-x-4">
                     <h1 class="text-2xl font-bold text-pink-600 cursor-pointer" onclick="logoClick()" id="logo">FashionHub</h1>
-                    <nav class="hidden md:flex space-x-6">
+                    
+                    <!-- Desktop Navigation -->
+                    <nav class="hidden md:flex space-x-6 ml-8">
                         <a href="#" onclick="showPage('home')" class="text-gray-700 hover:text-pink-600">Home</a>
                         <div class="dropdown relative">
                             <button class="text-gray-700 hover:text-pink-600 flex items-center">
@@ -96,15 +98,31 @@
                         <a href="#" onclick="showPage('contact')" class="text-gray-700 hover:text-pink-600">Contact</a>
                         <button id="adminBtn" onclick="showAdminPanel()" class="text-gray-700 hover:text-pink-600 hidden">Admin</button>
                     </nav>
+                    
+                    <!-- Mobile Hamburger Button -->
+                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-700 hover:text-pink-600">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                        </svg>
+                    </button>
                 </div>
                 
                 <div class="flex items-center space-x-4">
-                    <div class="relative">
+                    <!-- Desktop Search -->
+                    <div class="relative hidden md:block">
                         <input type="text" id="searchInput" placeholder="Search products..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
                         <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
                         </svg>
                     </div>
+                    
+                    <!-- Mobile Search Button -->
+                    <button id="mobileSearchBtn" onclick="toggleMobileSearch()" class="md:hidden p-2 text-gray-700 hover:text-pink-600">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+                        </svg>
+                    </button>
+                    
                     <button onclick="showCart()" class="relative p-2 text-gray-700 hover:text-pink-600">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
@@ -112,6 +130,45 @@
                         <span id="cartCount" class="absolute -top-2 -right-2 bg-pink-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
                     </button>
                 </div>
+            </div>
+            
+            <!-- Mobile Search Bar -->
+            <div id="mobileSearchBar" class="md:hidden border-t bg-white px-4 py-3 hidden">
+                <div class="relative">
+                    <input type="text" id="mobileSearchInput" placeholder="Search products..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Mobile Navigation Menu -->
+            <div id="mobileMenu" class="md:hidden bg-white border-t shadow-lg hidden">
+                <nav class="px-4 py-2">
+                    <a href="#" onclick="showPage('home'); closeMobileMenu()" class="block py-3 text-gray-700 hover:text-pink-600 border-b border-gray-100">Home</a>
+                    
+                    <!-- Mobile Shop Dropdown -->
+                    <div class="border-b border-gray-100">
+                        <button onclick="toggleMobileShopMenu()" class="w-full flex items-center justify-between py-3 text-gray-700 hover:text-pink-600">
+                            <span>Shop</span>
+                            <svg id="mobileShopArrow" class="w-4 h-4 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                            </svg>
+                        </button>
+                        <div id="mobileShopSubmenu" class="pl-4 pb-2 hidden">
+                            <a href="#" onclick="showCategory('clothes'); closeMobileMenu()" class="block py-2 text-gray-600 hover:text-pink-600">Clothes</a>
+                            <a href="#" onclick="showCategory('shoes'); closeMobileMenu()" class="block py-2 text-gray-600 hover:text-pink-600">Shoes</a>
+                            <a href="#" onclick="showCategory('glasses'); closeMobileMenu()" class="block py-2 text-gray-600 hover:text-pink-600">Glasses</a>
+                            <a href="#" onclick="showCategory('jewelry'); closeMobileMenu()" class="block py-2 text-gray-600 hover:text-pink-600">Jewelry</a>
+                            <a href="#" onclick="showCategory('bags'); closeMobileMenu()" class="block py-2 text-gray-600 hover:text-pink-600">Bags</a>
+                            <a href="#" onclick="showCategory('watches'); closeMobileMenu()" class="block py-2 text-gray-600 hover:text-pink-600">Wrist Watches</a>
+                        </div>
+                    </div>
+                    
+                    <a href="#" onclick="showPage('about'); closeMobileMenu()" class="block py-3 text-gray-700 hover:text-pink-600 border-b border-gray-100">About</a>
+                    <a href="#" onclick="showPage('contact'); closeMobileMenu()" class="block py-3 text-gray-700 hover:text-pink-600 border-b border-gray-100">Contact</a>
+                    <button id="mobileAdminBtn" onclick="showAdminPanel(); closeMobileMenu()" class="w-full text-left py-3 text-gray-700 hover:text-pink-600 hidden">Admin</button>
+                </nav>
             </div>
         </div>
     </header>
@@ -457,6 +514,13 @@
                     searchProducts(e.target.value);
                 }
             });
+            
+            // Mobile search functionality
+            document.getElementById('mobileSearchInput').addEventListener('input', function(e) {
+                if (e.target.value.length > 2) {
+                    searchProducts(e.target.value);
+                }
+            });
         });
 
         // Logo click handler for admin access
@@ -465,6 +529,7 @@
             if (logoClickCount === 4) {
                 isAdmin = true;
                 document.getElementById('adminBtn').classList.remove('hidden');
+                document.getElementById('mobileAdminBtn').classList.remove('hidden');
                 alert('Admin access granted!');
                 logoClickCount = 0;
             }
@@ -1013,6 +1078,54 @@
             window.open(urls[platform], '_blank', 'noopener,noreferrer');
         }
 
+        // Mobile menu functionality
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileSearchBar = document.getElementById('mobileSearchBar');
+            
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                // Close search bar if open
+                mobileSearchBar.classList.add('hidden');
+            } else {
+                mobileMenu.classList.add('hidden');
+            }
+        }
+        
+        function closeMobileMenu() {
+            document.getElementById('mobileMenu').classList.add('hidden');
+        }
+        
+        function toggleMobileShopMenu() {
+            const submenu = document.getElementById('mobileShopSubmenu');
+            const arrow = document.getElementById('mobileShopArrow');
+            
+            if (submenu.classList.contains('hidden')) {
+                submenu.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                submenu.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+        
+        function toggleMobileSearch() {
+            const mobileSearchBar = document.getElementById('mobileSearchBar');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (mobileSearchBar.classList.contains('hidden')) {
+                mobileSearchBar.classList.remove('hidden');
+                // Close menu if open
+                mobileMenu.classList.add('hidden');
+                // Focus on search input
+                setTimeout(() => {
+                    document.getElementById('mobileSearchInput').focus();
+                }, 100);
+            } else {
+                mobileSearchBar.classList.add('hidden');
+            }
+        }
+
         // Additional footer pages (simplified)
         window.addEventListener('click', function(e) {
             if (e.target.onclick && e.target.onclick.toString().includes('showPage')) {
@@ -1023,5 +1136,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987e62eda6476343',t:'MTc1OTM0NzE1MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987e6ce9c4b79490',t:'MTc1OTM0NzU2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
